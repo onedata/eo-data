@@ -1,5 +1,5 @@
 ifndef DATA_PATH
-$(error DATA_PATH is not set. Example, make push DATA_PATH=eodata_paths/Landsat-5.paths )
+$(error DATA_PATH is not set. Example, make push DATA_PATH=eodata_paths/Landsat-5.paths)
 endif
 
 ifndef DATA_SAMPLE_SIZE
@@ -13,10 +13,10 @@ REPO_NAME = $(shell git config --get remote.origin.url | tr ':.' '/'  | rev | cu
 
 # Linux and macos compatibility
 MD5_COMMAND = $(shell type -p md5sum || type -p md5)
-DATA_HASH = $(shell md5 -q $(DATA_PATH) 2>/dev/null ||  md5sum $(DATA_PATH) | awk '{print $1}')
+DATA_HASH = $(shell md5 -q $(DATA_PATH) 2>/dev/null ||  md5sum $(DATA_PATH) | cut -d' ' -f1)
 
 BUILD_DATE = $(shell date +'%y.%m.%d' | $(MD5_COMMAND) )
-NUMBER_OF_FILES=$(shell wc -l $(DATA_PATH) | awk '{ print $1 }' )
+NUMBER_OF_FILES=$(shell wc -l $(DATA_PATH) | cut -d' ' -f1)
 
 DATA_LATEST = $(PREFIX)/$(REPO_NAME):$(DATA_NAME)-latest
 DATA_TAGED = $(PREFIX)/$(REPO_NAME):$(DATA_NAME)-$(DATA_HASH)
@@ -34,6 +34,7 @@ data: image-data
 image-data-sample:
 	echo "*" > .dockerignore
 	echo "!paths-sample" >> .dockerignore
+	echo $(DATA_HASH)
 	head -n $(DATA_SAMPLE_SIZE) $(DATA_PATH) > paths-sample
 	docker build --build-arg PATHS_FILE=paths-sample --build-arg NUMBER_OF_FILES=$(DATA_SAMPLE_SIZE) -t $(DATA_SAMPLE_LATEST) . # Build new image and automatically tag it as latest
 	docker tag $(DATA_SAMPLE_LATEST) $(DATA_SAMPLE_TAGED)  # Add the version tag to the latest image
