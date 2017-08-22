@@ -40,6 +40,8 @@ image-data-sample:
 	docker tag $(DATA_SAMPLE_LATEST) $(DATA_SAMPLE_TAGED)  # Add the version tag to the latest image
 
 image-data:
+	echo "*" > .dockerignore
+	echo "!$(DATA_PATH)" >> .dockerignore
 	docker build --build-arg PATHS_FILE=$(DATA_PATH) --build-arg NUMBER_OF_FILES=$(NUMBER_OF_FILES) -t $(DATA_LATEST) . # Build new image and automatically tag it as latest
 	docker tag $(DATA_LATEST) $(DATA_TAGED)  # Add the version tag to the latest image
 
@@ -54,3 +56,4 @@ push-data-sample: image-data-sample
 clean:
 	rm paths-sample
 	rm .dockerignore
+
