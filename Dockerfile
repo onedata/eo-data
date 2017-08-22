@@ -7,7 +7,7 @@ ARG NUMBER_OF_FILES
 LABEL number-of-files=${NUMBER_OF_FILES}
 
 ENV NUMBER_OF_FILES=${NUMBER_OF_FILES}
+ENV DATA_DIR=/data
 
 COPY ${PATHS_FILE} /paths
-RUN while read file ; do mkdir -p $(dirname $file) ; touch $file ; echo "$file" > $file  ; done < paths
-
+RUN mkdir $DATA_DIR && while read file ; do file="$DATA_DIR/$file" ; mkdir -p "$(dirname $file)" ; echo "$file" > "$file"  ; done < paths
